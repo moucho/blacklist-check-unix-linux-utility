@@ -17,15 +17,16 @@ main() {
 
   if [[ $fqdn ]] ; then
 
-    echo -e "\\nEl dominio que se revisará: $1\\n" | cecho LGREEN
+    echo -e "\\nEl dominio que se revisará: $1" | cecho LGREEN
 
     domain=$(host $1 | head -n1 | awk '{print $4}')
 
     reverseit $domain "La IP no es válida o el dominio no resuelve." | cecho LRED
   else
 
-    echo -e "\\nLa IP que se revisará: $1\\n" | cecho LGREEN
+    echo -e "\\nLa IP que se revisará: $1" | cecho LGREEN
     reverseit $1 "La IP no es válida." | cecho LRED
+    exit 1
   fi
 
   loopthroughblacklists $1
@@ -64,14 +65,14 @@ loopthroughblacklists() {
 
         if [[ $listed == *"timed out"* ]]; then
 
-          echo "[timed out]" | cecho YELLOW 
+          echo "[tiempo de espera agotado]" | cecho YELLOW 
         else
         
-          echo "[blacklisted] (${listed})" | cecho LRED
+          echo "[Listada] (${listed})" | cecho LRED
         fi
       else
 
-          echo "[not listed]" | cecho LGREEN
+          echo "[No listada]" | cecho LGREEN
       fi
   done
 }
@@ -81,7 +82,12 @@ loopthroughblacklists() {
 senderscore() {
   reputacion=$(dig +short "${reverse}.score.senderscore.com"|cut -d'.' -f4)
   if [ ! -z "$reputacion" ]; then
-    echo -e "\\nLa IP tiene una reputación en Sender Score de ${reputacion}.\\n" | cecho LGREEN
+    if [[ "$reputacion" -ge 50 ]]; then
+      colorrespuesta=LGREEN
+    else
+      colorrespuesta=LRED
+    fi
+    echo -e "\\nLa IP tiene una reputación en Sender Score de ${reputacion}.\\n" | cecho $colorrespuesta
   else
     echo -e "\\nLa IP no ha enviado correos suficientes para estar clasificada en Sender Score.\\n" | cecho YELLOW
   fi
