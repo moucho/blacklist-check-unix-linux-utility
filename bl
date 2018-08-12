@@ -66,13 +66,12 @@ reverseit() {
 #### loopthroughblacklists ####
 loopthroughblacklists() {
   reverse_dns=$(dig +short -x "$1")
-  echo -e "$1 resuelve a ${reverse_dns:----}\\n" | colorear YELLOW
-  echo
+  echo -e "$1 resuelve a ${reverse_dns:----}\\n\\n" | colorear YELLOW
 
   for bl in ${blacklists} ; do
 
       printf $(env tz=Europe/Madrid date "+%y-%m-%d_%h:%m:%s_%z")
-      printf "%-40s" " ${reverse}.${bl}."
+      printf "%-56s" " ${reverse}.${bl}."
 
       listed="$(dig +short -t a ${reverse}.${bl}.)"
 
@@ -102,9 +101,9 @@ senderscore() {
     else
       colorrespuesta=LRED
     fi
-    echo -e "\\nLa IP tiene una reputación en Sender Score de ${reputacion} sobre 100.\\n" | colorear $colorrespuesta
+    echo -e "\\n\\nLa IP tiene una reputación en Sender Score de ${reputacion} sobre 100.\\n" | colorear $colorrespuesta
   else
-    echo -e "\\nLa IP no ha enviado correos suficientes para estar clasificada en Sender Score.\\n" | colorear YELLOW
+    echo -e "\\n\\nLa IP no ha enviado correos suficientes para estar clasificada en Sender Score.\\n" | colorear YELLOW
   fi
 }
 
